@@ -1,0 +1,27 @@
+query MediaByQueryString(
+	$query_string: String!
+	$page: Int = 1
+	$limit: Int = 200
+	$media_type: MediaType
+) {
+	Page(page: $page, perPage: $limit) {
+		pageInfo {
+			currentPage
+			hasNextPage
+		}
+		media(search: $query_string, type: $media_type) {
+			id
+			idMal
+			title {
+				english
+				romaji
+			}
+			coverImage {
+				large
+			}
+			description
+			siteUrl
+			type
+		}
+	}
+}

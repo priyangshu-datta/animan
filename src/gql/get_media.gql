@@ -1,0 +1,26 @@
+query MediaByID($id: Int!) {
+    Media(id: $id) {
+        title {
+            romaji
+            english
+        }
+        coverImage {
+            large
+            medium
+        }
+        format
+        type
+        description
+        season
+        seasonYear
+        episodes
+        chapters
+        genres
+        siteUrl
+        status
+        nextAiringEpisode {
+            airingAt
+            episode
+        }
+    }
+}

@@ -1,0 +1,12 @@
+query MediaByIDmin($id: Int!) {
+    Media(id: $id) {
+        title {
+            romaji
+        }
+        coverImage {
+            medium
+        }
+        description
+        siteUrl
+    }
+}

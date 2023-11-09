@@ -1,0 +1,31 @@
+query CharacterByID($id: Int!) {
+    Character(id: $id) {
+        name {
+            full
+            first
+            middle
+            last
+        }
+        age     
+        dateOfBirth {
+            year
+            month
+            day
+        }
+        description
+        image {
+            large
+            medium
+        }
+        siteUrl
+        media {
+            pageInfo {
+                currentPage
+                hasNextPage
+            }
+            nodes {
+                id
+            }
+        }
+    }
+}

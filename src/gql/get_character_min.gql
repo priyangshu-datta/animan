@@ -1,0 +1,12 @@
+query CharacterByIDmin($id: Int!) {
+	Character(id: $id) {
+		name {
+			full
+		}
+		image {
+			medium
+		}
+		siteUrl
+		description
+	}
+}

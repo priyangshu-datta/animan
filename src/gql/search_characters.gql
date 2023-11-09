@@ -1,0 +1,19 @@
+query CharacterByQueryString($query_string: String!, $page: Int = 1, $limit: Int = 10) {
+	Page(page: $page, perPage: $limit) {
+		pageInfo {
+			hasNextPage
+			currentPage
+		}
+		characters(search: $query_string) {
+			id
+			name {
+				full
+			}
+			image {
+				large
+			}
+			description
+			siteUrl
+		}
+	}
+}
