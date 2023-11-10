@@ -16,7 +16,7 @@ export const characterReviewRouter = router({
 				createdAt: z.optional(z.union([z.date(), z.string()]))
 			})
 		)
-		.mutation(async ({ input: { character_id, rate, comment, createdAt } }) => {
+		.mutation(async ({ input: { character_id, rate, comment, createdAt }, ctx }) => {
 			if (typeof createdAt === 'string') {
 				if (isNaN(+new Date(createdAt))) {
 					throw new TRPCError({
@@ -30,7 +30,12 @@ export const characterReviewRouter = router({
 				character_id,
 				comment,
 				rating: rate,
-				createdAt: typeof createdAt === 'string' ? createdAt : createdAt?.toString()
+				createdAt: typeof createdAt === 'string' ? createdAt : createdAt?.toString(),
+				user: {
+					connect: {
+						id: ctx.user.user_id
+					}
+				}
 			}
 			if (createdAt === undefined) delete data['createdAt']
 			try {
@@ -39,7 +44,7 @@ export const characterReviewRouter = router({
 						data
 					})
 				})
-			} catch(error) {
+			} catch (error) {
 				console.log(`Create Error Caught in Server, ${error}`)
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',
@@ -53,16 +58,19 @@ export const characterReviewRouter = router({
 				character_id: z.number()
 			})
 		)
-		.query(async ({ input: { character_id } }) => {
+		.query(async ({ input: { character_id }, ctx }) => {
 			try {
 				return await prisma_op(async (prisma) => {
 					return await prisma.characterReview.findMany({
 						where: {
-							character_id
+							character_id,
+							user: {
+								id: ctx.user.user_id
+							}
 						}
 					})
 				})
-			} catch(error) {
+			} catch (error) {
 				console.log(`Get Error Caught in Server, ${error}`)
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',
@@ -76,16 +84,19 @@ export const characterReviewRouter = router({
 				id: z.string()
 			})
 		)
-		.query(async ({ input: { id } }) => {
+		.query(async ({ input: { id }, ctx }) => {
 			try {
 				return await prisma_op(async (prisma) => {
 					return await prisma.characterReview.findMany({
 						where: {
-							id
+							id,
+							user: {
+								id: ctx.user.user_id
+							}
 						}
 					})
 				})
-			} catch(error) {
+			} catch (error) {
 				console.log(`Read Error Caught in Server, ${error}`)
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',
@@ -107,7 +118,7 @@ export const characterReviewRouter = router({
 				createdAt: z.optional(z.date())
 			})
 		)
-		.mutation(async ({ input: { id, rate, comment, createdAt } }) => {
+		.mutation(async ({ input: { id, rate, comment, createdAt }, ctx }) => {
 			if (rate === undefined && comment === undefined && createdAt === undefined)
 				throw new TRPCError({
 					code: 'BAD_REQUEST',
@@ -123,12 +134,15 @@ export const characterReviewRouter = router({
 					if (createdAt === undefined) delete data['createdAt']
 					return await prisma.characterReview.update({
 						where: {
-							id
+							id,
+							user: {
+								id: ctx.user.user_id
+							}
 						},
 						data
 					})
 				})
-			} catch(error) {
+			} catch (error) {
 				console.log(`Update Error Caught in Server, ${error}`)
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',
@@ -142,16 +156,17 @@ export const characterReviewRouter = router({
 				id: z.string()
 			})
 		)
-		.mutation(async ({ input: { id } }) => {
+		.mutation(async ({ input: { id }, ctx }) => {
 			try {
 				return await prisma_op(async (prisma) => {
 					return await prisma.characterReview.delete({
 						where: {
-							id
+							id,
+							user: { id: ctx.user.user_id }
 						}
 					})
 				})
-			} catch(error) {
+			} catch (error) {
 				console.log(`Delete Error Caught in Server, ${error}`)
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',

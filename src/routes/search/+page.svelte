@@ -33,6 +33,7 @@
 	) => {
 		if (query_string.length > 0) {
 			abortController.abort()
+
 			return {
 				type: 'media' as const,
 				data: (

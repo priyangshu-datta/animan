@@ -1,40 +1,39 @@
 <script lang="ts">
-	import type { UserMediaByStatusQuery } from '$lib/graphql'
-	import { writable } from 'svelte/store'
-	import type { PageData } from '../$types'
+	import { goto } from '$app/navigation'
+	import { MediaType } from '$lib/graphql'
+	import { writable, type Writable } from 'svelte/store'
 	import MediaItem from '../../components/media-item.svelte'
-	import { loadAnilistUser, logoutAnilistUser } from '../../lib/settings/storage'
-	import { invalidateAll } from '$app/navigation'
+	import Paginator from '../../components/paginator.svelte'
+	import type { PageData } from './$types'
+	import { sentenceCase } from '$utils'
 
 	export let data: PageData
 
-	$: mediaStore = writable<{
-		hasNextPage: boolean
-		data: NonNullable<UserMediaByStatusQuery['Page']>['mediaList']
-	}>({
-		hasNextPage: data?.userData?.Page?.pageInfo?.hasNextPage ?? false,
-		data: data?.userData?.Page?.mediaList ?? []
-	})
+	let media_type: Writable<MediaType> = writable(MediaType.Anime)
+	const handleLogout = () => {
+			fetch('/auth', {
+				method: 'delete'
+			}).then((res) => {
+				// if (res.)
+				console.log('logout:', res)
+				
+			}).then(()=>{
+				goto("/")
+			})
+		}
 </script>
 
-{#if data.data === null}
-	<a href="https://anilist.co/api/v2/oauth/authorize?client_id=5505&response_type=token">
-		Login with AniList
-	</a>
-{:else}
-	<h1>Hello {data?.userDetails?.Viewer?.name}</h1>
-	<button
-		on:click={() => {
-			logoutAnilistUser()
-			invalidateAll()
-		}}>Logout</button
-	>
-{/if}
+<nav class="flex justify-between p-4">
+	<h1 class="h3">Hello {sentenceCase(data?.user?.Viewer?.name ?? '')}</h1>
+	<button class="h3" on:click={handleLogout}>Logout</button>
+</nav>
 
-<div class="flex flex-wrap gap-4 justify-center">
-	{#each $mediaStore['data'] ?? [] as item, index}
-		<MediaItem
-			item={{ type: 'userMedia', data: item, lastEle: index + 1 === $mediaStore['data']?.length }}
-		/>
-	{/each}
-</div>
+<select bind:value={$media_type}>
+	<option value={MediaType.Anime} selected>{MediaType.Anime}</option>
+	<option value={MediaType.Manga}>{MediaType.Manga}</option>
+</select>
+{#if $media_type === MediaType.Anime}
+	<Paginator media_type={MediaType.Anime} />
+{:else}
+	<Paginator media_type={MediaType.Manga} />
+{/if}

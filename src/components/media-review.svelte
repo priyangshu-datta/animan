@@ -15,7 +15,7 @@
 	async function deleteReview() {
 		let result
 		await trpc(page)
-			.review.mediaReview.delete.mutate({ review_id })
+			.review.mediaReview.delete.mutate({ id: review_id })
 			.then((res) => (result = res))
 			.catch((er) => {
 				console.log(`Delete Error, caught in Client: ${er}`)

@@ -20,8 +20,6 @@
 		) as HTMLFormElement
 		const formData = new FormData(form)
 
-		console.log(form)
-
 		const id = formData.get('id')
 		const unit = formData.get('unit')
 		const type = formData.get('type')
@@ -37,11 +35,12 @@
 		submittingReview = true
 
 		await trpc($page).review.mediaReview.create.mutate({
-			id: parseInt(id.toString()),
+			media_id: parseInt(id.toString()),
 			type: type.toString() as 'ANIME' | 'MANGA',
 			comment: comment.toString(),
 			rate: parseInt(rating.toString()),
 			unit: parseInt(unit?.toString())
+
 			// createdAt: getTimeStamp(new Date(createdAt?.toString()!).getTime() / 1000)
 		})
 
@@ -104,7 +103,7 @@
 	})
 
 	async function getReviews() {
-		return await trpc($page).review.mediaReview.get.query({ id: parseInt($page.params.id) })
+		return await trpc($page).review.mediaReview.get.query({ media_id: parseInt($page.params.id) })
 	}
 
 	let timeLeft = prettyPrintDateDifference(
@@ -112,10 +111,10 @@
 		Date.now()
 	)
 	setInterval(() => {
-		timeLeft = prettyPrintDateDifference((data.nextAiringEpisode?.airingAt ?? 0) * 1000, Date.now())
+		timeLeft = prettyPrintDateDifference(data.nextAiringEpisode?.airingAt * 1000, Date.now())
 	}, 1000)
 
-	let maxEpisode = data.nextAiringEpisode?.episode
+	let maxEpisodes = data.nextAiringEpisode?.episode
 		? data.nextAiringEpisode?.episode - 1
 		: data.episodes
 
@@ -205,7 +204,7 @@
 						<legend class="text-2xl float-right">Comments</legend>
 						{#each reviewList as item}
 							<MediaReview
-								review_id={item.review_id}
+								review_id={item.id}
 								comment={item.comment}
 								rating={item.rating}
 								createdAt={item.createdAt}
@@ -235,7 +234,14 @@
 				<legend>Review</legend>
 				<input type="hidden" name="id" value={$page.params.id} required />
 				<input type="hidden" name="type" value={data.type} required />
-				<input type="number" name="unit" max={maxEpisode} required placeholder="Episode" />
+				<input
+					type="number"
+					name="unit"
+					max={maxEpisodes}
+					required
+					placeholder={data.type === 'ANIME' ? 'Episode' : 'Chapter'}
+					step={data.type === 'ANIME' ? 1 : 0.1}
+				/>
 				<input type="number" name="rating" max="10.0" min="0.0" step="0.01" placeholder="Rating" />
 
 				<div hidden>
@@ -272,7 +278,14 @@
 			<legend>Review</legend>
 			<input type="hidden" name="id" value={$page.params.id} required />
 			<input type="hidden" name="type" value={data.type} required />
-			<input type="number" name="unit" max={maxEpisode} required placeholder="Episode" />
+			<input
+				type="number"
+				name="unit"
+				max={maxEpisodes}
+				required
+				placeholder={data.type === 'ANIME' ? 'Episode' : 'Chapter'}
+				step={data.type === 'ANIME' ? 1 : 0.1}
+			/>
 			<input type="number" name="rating" max="10.0" min="0.0" step="0.01" placeholder="Rating" />
 
 			<div hidden>

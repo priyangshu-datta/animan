@@ -10,10 +10,7 @@ query UserMediaByStatus(
 			currentPage
 			hasNextPage
 		}
-		mediaList(status: $status, userId: $userId, type: $type) {
-			user {
-				name
-			}
+		mediaList(status: $status, userId: $userId, type: $type, sort: UPDATED_TIME_DESC) {
 			media {
 				id
 				idMal

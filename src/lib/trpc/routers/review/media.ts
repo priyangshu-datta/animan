@@ -2,6 +2,10 @@ import { publicProcedure, router } from '../../router'
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
 import { prisma_op } from '$lib/helpers'
+import * as jose from 'jose'
+import { JWT_SECRET } from '$env/static/private'
+import { cookieValidator } from '$lib/types'
+import { fail } from '@sveltejs/kit'
 
 export const mediaReviewRouter = router({
 	create: publicProcedure
@@ -18,7 +22,7 @@ export const mediaReviewRouter = router({
 				createdAt: z.optional(z.union([z.date(), z.string()]))
 			})
 		)
-		.mutation(async ({ input: { media_id, unit, type, rate, comment, createdAt } }) => {
+		.mutation(async ({ input: { media_id, unit, type, rate, comment, createdAt }, ctx }) => {
 			if (typeof createdAt === 'string') {
 				if (isNaN(+new Date(createdAt))) {
 					throw new TRPCError({
@@ -40,10 +44,17 @@ export const mediaReviewRouter = router({
 			try {
 				return await prisma_op(async (prisma) => {
 					return await prisma.mediaReview.create({
-						data
+						data: {
+							...data,
+							user: {
+								connect: {
+									id: ctx.user.user_id
+								}
+							}
+						}
 					})
 				})
-			} catch(error) {
+			} catch (error) {
 				console.log(`Create Error Caught in Server, ${error}`)
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',
@@ -57,16 +68,30 @@ export const mediaReviewRouter = router({
 				media_id: z.number()
 			})
 		)
-		.query(async ({ input: { media_id } }) => {
+		.query(async ({ input: { media_id }, ctx }) => {
 			try {
 				return await prisma_op(async (prisma) => {
 					return await prisma.mediaReview.findMany({
 						where: {
-							media_id
+							media_id,
+							user: {
+								id: ctx.user.user_id
+							}
+						},
+						select: {
+							comment: true,
+							user: true,
+							createdAt: true,
+							id: true,
+							media_id: true,
+							rating: true,
+							type: true,
+							unit: true,
+							updatedAt: true
 						}
 					})
 				})
-			} catch(error) {
+			} catch (error) {
 				console.log(`Get Error Caught in Server, ${error}`)
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',
@@ -80,16 +105,19 @@ export const mediaReviewRouter = router({
 				id: z.string()
 			})
 		)
-		.query(async ({ input: { id } }) => {
+		.query(async ({ input: { id }, ctx }) => {
 			try {
 				return await prisma_op(async (prisma) => {
 					return await prisma.mediaReview.findMany({
 						where: {
-							id
+							id,
+							user: {
+								id: ctx.user.user_id
+							}
 						}
 					})
 				})
-			} catch(error) {
+			} catch (error) {
 				console.log(`Read Error Caught in Server, ${error}`)
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',
@@ -111,7 +139,7 @@ export const mediaReviewRouter = router({
 				createdAt: z.optional(z.date())
 			})
 		)
-		.mutation(async ({ input: { id, rate, comment, createdAt } }) => {
+		.mutation(async ({ input: { id, rate, comment, createdAt }, ctx }) => {
 			if (rate === undefined && comment === undefined && createdAt === undefined)
 				throw new TRPCError({
 					code: 'BAD_REQUEST',
@@ -127,12 +155,15 @@ export const mediaReviewRouter = router({
 					if (createdAt === undefined) delete data['createdAt']
 					return await prisma.mediaReview.update({
 						where: {
-							id
+							id,
+							user: {
+								id: ctx.user.user_id
+							}
 						},
 						data
 					})
 				})
-			} catch(error) {
+			} catch (error) {
 				console.log(`Update Error Caught in Server, ${error}`)
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',
@@ -146,16 +177,19 @@ export const mediaReviewRouter = router({
 				id: z.string()
 			})
 		)
-		.mutation(async ({ input: { id } }) => {
+		.mutation(async ({ input: { id }, ctx }) => {
 			try {
 				return await prisma_op(async (prisma) => {
 					return await prisma.mediaReview.delete({
 						where: {
-							id
+							id,
+							user: {
+								id: ctx.user.user_id
+							}
 						}
 					})
 				})
-			} catch(error) {
+			} catch (error) {
 				console.log(`Delete Error Caught in Server, ${error}`)
 				throw new TRPCError({
 					code: 'INTERNAL_SERVER_ERROR',

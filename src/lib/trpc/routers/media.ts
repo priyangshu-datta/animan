@@ -22,8 +22,6 @@ export const mediaRouter = router({
 			})
 		)
 		.query(async ({ input: { ...variables } }) => {
-			console.log(variables);
-			
 			let result = await fetch_gql<MediaByQueryStringQuery, MediaByQueryStringQueryVariables>(
 				'search_medias',
 				true,

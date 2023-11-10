@@ -3,7 +3,6 @@ import { error, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 export const ssr = true;
-export const prerender = true;
 
 export const load: PageServerLoad = async (event) => {
 	const id = parseInt(event.params.id);

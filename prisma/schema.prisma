@@ -13,16 +13,17 @@ datasource db {
 // username and password hashed. during login, store username in localstorage. if any data related to our site is altered then make user login again.
 
 model User {
-  id         String   @id @default(uuid())
-  anilist_id Int?
-  username   String   @unique
-  password   String
-  salt       String
-  createdAt  DateTime @default(now())
+  id              String            @id @default(uuid())
+  anilist_id      Int               @unique
+  createdAt       DateTime          @default(now())
+  MediaReview     MediaReview[]
+  CharacterReview CharacterReview[]
 }
 
 model MediaReview {
   id        String   @id @default(uuid())
+  user_id   String
+  user      User     @relation(fields: [user_id], references: [id])
   media_id  Int
   type      String
   unit      Float
@@ -34,6 +35,8 @@ model MediaReview {
 
 model CharacterReview {
   id           String   @id @default(uuid())
+  user_id      String
+  user         User     @relation(fields: [user_id], references: [id])
   character_id Int
   rating       Float
   comment      String

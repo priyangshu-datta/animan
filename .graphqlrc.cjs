@@ -2,7 +2,7 @@ module.exports = {
     projects: {
         app: {
             schema: "./schema.graphql",
-            documents: ["./src/**/*.{graphql,gql}"],
+            documents: ["./src/**/*.{graphql,gql, svelte}"],
             extensions: {
                 endpoints: {
                     default: {
