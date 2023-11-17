@@ -35,7 +35,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	accessTokenBody.set('client_id', '5505')
 	accessTokenBody.set('client_secret', ANILIST_CLIENT_SECRET_CODE)
 	accessTokenBody.set('code', code)
-	accessTokenBody.set('redirect_uri', 'http://localhost:4173/auth')
+	accessTokenBody.set('redirect_uri', 'https://pd-animan.vercel.app/auth')
 
 	const authResponse = await fetch('https://anilist.co/api/v2/oauth/token', {
 		body: accessTokenBody,
