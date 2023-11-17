@@ -1,3 +1,4 @@
+# Animan
 Login with Anilist on HomePage.
 Write reviews on any anime or manga, for any or every episode or chapter.
 Currently, the reviews are private to the user.
