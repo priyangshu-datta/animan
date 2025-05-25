@@ -6,4 +6,4 @@
 	url = git@github.com:priyangshu-datta/animan-hono.git
 [submodule "next"]
 	path = next
-	url = git@github.com:priyangshu-datta/animan-next.git
+	url = https://github.com/priyangshu-datta/animan-next
